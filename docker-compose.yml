@@ -1,0 +1,84 @@
+version: '3.9'
+
+services:
+  auth_db:
+    container_name: auth_db
+    image: postgres:13.1
+    restart: unless-stopped
+    env_file: .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  auth_web:
+    container_name: auth_web
+    build:
+      context: .
+      target: django
+    restart: unless-stopped
+    depends_on:
+      auth_db:
+        condition: service_healthy
+      auth_redis:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8585:8585"
+    command: python auth/manage.py runserver 0.0.0.0:8585
+    volumes:
+      - .:/app
+    env_file: .env
+
+  auth_elasticsearch:
+    container_name: auth_elasticsearch
+    image: elasticsearch:8.15.3
+    ports:
+      - 9200:9200
+    env_file: .env
+
+
+  auth_redis:
+    container_name: auth_redis
+    image: redis:5.0.12
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    restart: unless-stopped
+
+  auth_celery:
+    build: .
+    working_dir: /app/auth
+    command: [ "celery", "-A", "auth", "worker", "-l", "info", "--autoscale", "4,2" ]
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    depends_on:
+      - auth_db
+      - auth_redis
+    env_file: .env
+
+  auth_beat:
+    build: .
+    working_dir: /app/auth
+    command: [ "celery", "-A", "auth", "beat", "-l", "info", "--scheduler", "django_celery_beat.schedulers:DatabaseScheduler" ]
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - type: volume
+        source: beat_scheduler
+        target: /app
+    depends_on:
+      - auth_db
+      - auth_redis
+    env_file: .env
+
+volumes:
+  beat_scheduler:
+    name: auth_beat
+  postgres_db:
+    name: auth_db
+
+networks:
+  default:
+    name: auth
+
