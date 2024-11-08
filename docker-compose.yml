@@ -31,14 +31,6 @@ services:
       - .:/app
     env_file: .env
 
-  auth_elasticsearch:
-    container_name: auth_elasticsearch
-    image: elasticsearch:8.15.3
-    ports:
-      - 9200:9200
-    env_file: .env
-
-
   auth_redis:
     container_name: auth_redis
     image: redis:5.0.12

@@ -11,4 +11,5 @@ urlpatterns = [
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('verification/code/', views.IssueVerficationCodeView.as_view(), name='verification_code'),
     path('verification/code/verify/', views.VerifyEmailWithCode.as_view(), name='verification_code_verify'),
+    path('logs/login/attemps/', views.LoginLogsListView.as_view(), name='login_attempts'),
 ]

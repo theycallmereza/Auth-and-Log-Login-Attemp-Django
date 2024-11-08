@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .serializers import RegisterSerializer
-from rest_framework import generics, views
+from rest_framework import generics, views, pagination
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
+from accounts.serializers import RegisterSerializer, LoginLogSerializer
+from accounts.models import LoginLog
 
 User = get_user_model()
 
@@ -49,3 +50,10 @@ class VerifyEmailWithCode(views.APIView):
 
         else:
             return Response({"status": "failed", "message": "code-wrong"})
+
+
+class LoginLogsListView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = LoginLog.objects.all()
+    serializer_class = LoginLogSerializer
+    pagination_class = pagination.PageNumberPagination

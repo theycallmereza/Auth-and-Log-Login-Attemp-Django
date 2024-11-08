@@ -178,14 +178,5 @@ CELERY_TIMEZONE = "Asia/Tehran"
 # User Mode
 AUTH_USER_MODEL = "accounts.User"
 
-# Elastic
-ELASTICSEARCH_DSL = {
-    'default': {
-        'hosts': ['https://localhost:9200'],
-        'http_auth': ('elastic', 'password'),
-        'verify_certs': False,
-    },
-}
-
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

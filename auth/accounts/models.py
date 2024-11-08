@@ -40,3 +40,20 @@ class User(AbstractUser):
             return True
         else:
             return None
+
+
+class LoginLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             null=True,
+                             blank=True)
+    email = models.EmailField()
+    ip = models.GenericIPAddressField()
+    created_at = models.DateTimeField()
+    user_agent = models.TextField()
+    reject_reason = models.TextField()
+    successful = models.BooleanField()
+    suspicious = models.BooleanField()
+
+
+    def __str__(self):
+        return f"{self.email}"
