@@ -3,8 +3,8 @@ celery[redis]
 django < 4.3
 django-silk
 djangorestframework
+djangorestframework-simplejwt
 django_celery_beat
-django-elasticsearch-dsl
 drf-yasg
 factory-boy
 Pillow

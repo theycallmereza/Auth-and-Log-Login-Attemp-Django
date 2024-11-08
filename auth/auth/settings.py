@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     # Third Party
     "rest_framework",
+    "rest_framework_simplejwt",
     "drf_yasg",
     "celery",
     "django_celery_beat",
@@ -150,10 +151,14 @@ CACHES = {
     }
 }
 
+# Auth backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.authentication_backends.EmailBackend',
+]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ]
 }
 
@@ -181,3 +186,6 @@ ELASTICSEARCH_DSL = {
         'verify_certs': False,
     },
 }
+
+# Email
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
